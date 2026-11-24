@@ -26,3 +26,7 @@ Thumbs.db
 
 # Config
 config.yaml
+
+# Docs
+docs/node_modules/
+docs/.vitepress/dist/

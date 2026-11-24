@@ -1,0 +1,13 @@
+{
+  "name": "ai-dev-tools-docs",
+  "version": "0.0.0",
+  "description": "Documentation for ai-dev-tools",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.3.0"
+  }
+}
