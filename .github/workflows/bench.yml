@@ -1,0 +1,21 @@
+# .github/workflows/bench.yml
+name: Benchmarks
+on:
+  schedule: [{ cron: '0 0 * * 0' }] # weekly
+  workflow_dispatch:
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+      - run: go test ./pkg/... -bench=. -benchtime=5s -benchmem > bench.txt
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git checkout -b benchmarks
+          mkdir -p benchmarks
+          mv bench.txt benchmarks/$(date +%Y-%m-%d).txt
+          git add benchmarks/
+          git commit -m "chore(bench): $(date +%Y-%m-%d)"
+          git push origin benchmarks --force
