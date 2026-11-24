@@ -1,0 +1,86 @@
+{
+  ".golangci.yml": {
+    "mtime": 1795372933.284527,
+    "seen": 1795376599.754136,
+    "ast_hash": "293f46b3685c7c1280a65381d4dbb396",
+    "semantic_hash": "293f46b3685c7c1280a65381d4dbb396"
+  },
+  "cmd/ai-dev/main.go": {
+    "mtime": 1795372960.9128284,
+    "seen": 1795376599.75414,
+    "ast_hash": "3420db903ab7454a5e439df7cca75ff4",
+    "semantic_hash": "3420db903ab7454a5e439df7cca75ff4"
+  },
+  "go.mod": {
+    "mtime": 1795376525.239592,
+    "seen": 1795376599.7541409,
+    "ast_hash": "d1ec38f85f4d2e3f4c2b4c7f1e7e0282",
+    "semantic_hash": "d1ec38f85f4d2e3f4c2b4c7f1e7e0282"
+  },
+  "internal/cli/changelog/changelog.go": {
+    "mtime": 1795372960.9138007,
+    "seen": 1795376599.754142,
+    "ast_hash": "2a6dbd6cf8edfe2000779452d34b0cf5",
+    "semantic_hash": "2a6dbd6cf8edfe2000779452d34b0cf5"
+  },
+  "internal/cli/commit/commit.go": {
+    "mtime": 1795372960.9141104,
+    "seen": 1795376599.754143,
+    "ast_hash": "7d24389989c5e7c2315cb8576cda40da",
+    "semantic_hash": "7d24389989c5e7c2315cb8576cda40da"
+  },
+  "internal/cli/config/config.go": {
+    "mtime": 1795372960.9143908,
+    "seen": 1795376599.754144,
+    "ast_hash": "a9c7d383be8d1de0d907177670a87b2c",
+    "semantic_hash": "a9c7d383be8d1de0d907177670a87b2c"
+  },
+  "internal/cli/doctor/doctor.go": {
+    "mtime": 1795372960.9146633,
+    "seen": 1795376599.754144,
+    "ast_hash": "c03a91906e99aa0a6c9553cfcd785cd8",
+    "semantic_hash": "c03a91906e99aa0a6c9553cfcd785cd8"
+  },
+  "internal/cli/review/review.go": {
+    "mtime": 1795372960.9149332,
+    "seen": 1795376599.754145,
+    "ast_hash": "ce892e853c90d2420608f0926292c86e",
+    "semantic_hash": "ce892e853c90d2420608f0926292c86e"
+  },
+  "internal/cli/root.go": {
+    "mtime": 1795372960.9131577,
+    "seen": 1795376599.754145,
+    "ast_hash": "8dd7aebad07c2604cd95477267bfef6a",
+    "semantic_hash": "8dd7aebad07c2604cd95477267bfef6a"
+  },
+  "internal/cli/root_test.go": {
+    "mtime": 1795372960.9134834,
+    "seen": 1795376599.754146,
+    "ast_hash": "20b5a6d6f17ddffb71fddcf788b45227",
+    "semantic_hash": "20b5a6d6f17ddffb71fddcf788b45227"
+  },
+  "internal/cli/testgen/testgen.go": {
+    "mtime": 1795372960.9151833,
+    "seen": 1795376599.754146,
+    "ast_hash": "a9e4ab43563128e053ea8393b279ae12",
+    "semantic_hash": "a9e4ab43563128e053ea8393b279ae12"
+  },
+  "internal/cli/version/version.go": {
+    "mtime": 1795372960.9154491,
+    "seen": 1795376599.754147,
+    "ast_hash": "3988978fbf51fe7c8590ff65926a963c",
+    "semantic_hash": "3988978fbf51fe7c8590ff65926a963c"
+  },
+  "docs/superpowers/plans/2026-11-22-ai-dev-tools-plan.md": {
+    "mtime": 1795372462.340173,
+    "seen": 1795376599.754148,
+    "ast_hash": "3fca9209a1d80706e9bf6f56bb9470af",
+    "semantic_hash": "3fca9209a1d80706e9bf6f56bb9470af"
+  },
+  "docs/superpowers/specs/2026-11-22-ai-dev-tools-design.md": {
+    "mtime": 1795372125.5718355,
+    "seen": 1795376599.754148,
+    "ast_hash": "56af2fa809b776c7abf55d7e29b14bba",
+    "semantic_hash": "56af2fa809b776c7abf55d7e29b14bba"
+  }
+}

@@ -53,14 +53,16 @@ func runDoctor(cmd *cobra.Command, repo git.Repo, ghClient github.Client, llmPro
 		fmt.Fprintf(out, "✓ %s API reachable\n", providerDisplayName(cfg.Provider.Name))
 	}
 
-	// 4. Check GitHub Authentication (only if configured)
-	if cfg.GitHub.TokenEnv != "" || cfg.GitHub.Owner != "" || cfg.GitHub.Repo != "" {
+	// 4. Check GitHub Authentication (only if Owner AND Repo are both configured)
+	if cfg.GitHub.Owner != "" && cfg.GitHub.Repo != "" {
 		fmt.Fprint(out, "Checking GitHub authentication... ")
 		if err := checkGitHub(ctx, ghClient, cfg); err != nil {
 			fmt.Fprintf(out, "✗ GitHub authentication failed: %v\n", err)
 		} else {
 			fmt.Fprintln(out, "✓ GitHub authentication")
 		}
+	} else if cfg.GitHub.TokenEnv != "" || cfg.GitHub.Owner != "" || cfg.GitHub.Repo != "" {
+		fmt.Fprintln(out, "Checking GitHub authentication... ⊘ Skipped (Owner and Repo required)")
 	}
 
 	return nil

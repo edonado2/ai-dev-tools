@@ -2,11 +2,14 @@
 package changelog
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -32,16 +35,10 @@ func NewCommand(repo git.Repo, ghClient github.Client, llmProvider llm.Provider,
 	var owner, repoName string
 	var prNum int
 
-	// Get default config values
-	changelogCfg := config.ChangelogConfig{
-		Format:     "keepachangelog",
-		IncludePRs: false,
-		Output:     "",
-	}
-	if cfg != nil && cfg.Tools.Changelog.Format != "" {
-		changelogCfg.Format = cfg.Tools.Changelog.Format
-		changelogCfg.IncludePRs = cfg.Tools.Changelog.IncludePRs
-		changelogCfg.Output = cfg.Tools.Changelog.Output
+	// Get default config values from config (no hardcoded defaults)
+	var changelogCfg config.ChangelogConfig
+	if cfg != nil {
+		changelogCfg = cfg.Tools.Changelog
 	}
 
 	cmd := &cobra.Command{
@@ -70,6 +67,9 @@ Can enrich with GitHub PR data when --include-prs flag is used.`,
 				since = tag
 			}
 
+			// Get previous version (tag before since)
+			previousVersion := getPreviousTag(repo, since)
+
 			// Get commits since tag
 			commits, err := repo.Log(git.LogOptions{
 				Since: since,
@@ -83,10 +83,24 @@ Can enrich with GitHub PR data when --include-prs flag is used.`,
 				return errors.New("no commits found since " + since)
 			}
 
-			// Format commits for prompt
-			commitStrs := make([]string, len(commits))
-			for i, c := range commits {
-				commitStrs[i] = fmt.Sprintf("%s %s", c.ShortHash, c.Message)
+			// If includePRs is enabled, enrich commits with PR data
+			var commitStrs []string
+			if includePRs {
+				if ghClient == nil {
+					return errors.New("GitHub client not configured; cannot use --include-prs")
+				}
+				if owner == "" || repoName == "" {
+					return errors.New("--owner and --repo are required when using --include-prs")
+				}
+				commitStrs, err = enrichCommitsWithPRs(ctx, ghClient, owner, repoName, commits, prNum)
+				if err != nil {
+					return fmt.Errorf("enrich commits with PRs: %w", err)
+				}
+			} else {
+				commitStrs = make([]string, len(commits))
+				for i, c := range commits {
+					commitStrs[i] = fmt.Sprintf("%s %s", c.ShortHash, c.Message)
+				}
 			}
 
 			// Determine version
@@ -94,13 +108,6 @@ Can enrich with GitHub PR data when --include-prs flag is used.`,
 			if since != "" {
 				// Try to parse version from tag
 				version = strings.TrimPrefix(since, "v")
-			}
-
-			// Get previous version if possible
-			previousVersion := ""
-			if since != "" {
-				// Get tag before since
-				// For now, we'll leave this empty
 			}
 
 			// Render prompt template
@@ -180,6 +187,103 @@ Can enrich with GitHub PR data when --include-prs flag is used.`,
 	}
 
 	return cmd
+}
+
+// getPreviousTag returns the tag before the given tag
+func getPreviousTag(repo git.Repo, since string) string {
+	// Use git to get all tags sorted by date, then find the one before 'since'
+	rootDir, err := repo.RootDir()
+	if err != nil {
+		return ""
+	}
+
+	cmd := exec.Command("git", "tag", "--sort=-creatordate")
+	cmd.Dir = rootDir
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return ""
+	}
+
+	tags := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+	found := false
+	for _, tag := range tags {
+		tag = strings.TrimSpace(tag)
+		if tag == "" {
+			continue
+		}
+		if found {
+			return tag
+		}
+		if tag == since {
+			found = true
+		}
+	}
+	return ""
+}
+
+// enrichCommitsWithPRs fetches PR data for commits and returns enriched commit strings
+func enrichCommitsWithPRs(ctx context.Context, ghClient github.Client, owner, repoName string, commits []git.Commit, specificPR int) ([]string, error) {
+	// Build a map of commit SHA -> git.Commit for quick lookup
+	commitMap := make(map[string]git.Commit)
+	for _, c := range commits {
+		commitMap[c.Hash] = c
+	}
+
+	// If specific PR number provided, fetch that PR and enrich matching commits
+	if specificPR > 0 {
+		pr, err := ghClient.GetPR(owner, repoName, specificPR)
+		if err != nil {
+			return nil, fmt.Errorf("get PR #%d: %w", specificPR, err)
+		}
+		prCommits, err := ghClient.ListPRCommits(owner, repoName, specificPR)
+		if err != nil {
+			return nil, fmt.Errorf("list PR commits: %w", err)
+		}
+		prFiles, err := ghClient.ListPRFiles(owner, repoName, specificPR)
+		if err != nil {
+			return nil, fmt.Errorf("list PR files: %w", err)
+		}
+		return formatEnrichedCommits(pr, prCommits, prFiles, commitMap), nil
+	}
+
+	// Without a specific PR, we cannot match commits to PRs
+	// (would require ListPRs or SearchPRs which aren't in the interface)
+	// Return original commit strings
+	var commitStrs []string
+	for _, c := range commits {
+		commitStrs = append(commitStrs, fmt.Sprintf("%s %s", c.ShortHash, c.Message))
+	}
+	return commitStrs, nil
+}
+
+func formatEnrichedCommits(pr *github.PR, prCommits []github.Commit, prFiles []github.PRFile, commitMap map[string]git.Commit) []string {
+	var result []string
+	result = append(result, fmt.Sprintf("PR #%d: %s", pr.Number, pr.Title))
+	if pr.Body != "" {
+		result = append(result, fmt.Sprintf("  Description: %s", pr.Body))
+	}
+	if len(prFiles) > 0 {
+		result = append(result, "  Files changed:")
+		for _, f := range prFiles {
+			result = append(result, fmt.Sprintf("    %s (%s)", f.Filename, f.Status))
+		}
+	}
+	result = append(result, "  Commits:")
+	for _, pc := range prCommits {
+		shortSHA := pc.SHA
+		if len(shortSHA) > 7 {
+			shortSHA = shortSHA[:7]
+		}
+		// Check if this commit is in our commit map
+		if gc, ok := commitMap[pc.SHA]; ok {
+			result = append(result, fmt.Sprintf("    %s %s (matched: %s)", shortSHA, pc.Message, gc.ShortHash))
+		} else {
+			result = append(result, fmt.Sprintf("    %s %s", shortSHA, pc.Message))
+		}
+	}
+	return result
 }
 
 func formatKeepAChangelog(out ChangelogOutput, sinceTag string) string {

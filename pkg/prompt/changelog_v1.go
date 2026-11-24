@@ -8,7 +8,7 @@ var ChangelogTemplateV1 = &Template{
 	SystemPrompt: `You are a senior engineer writing a changelog.
 Follow Keep a Changelog format.
 Group commits by type: Added, Changed, Deprecated, Removed, Fixed, Security.
-Output in Markdown format.`,
+Output JSON with version, date, and sections.`,
 	UserPrompt: `Generate a changelog from these commits:
 ---
 {{.Commits}}
@@ -34,8 +34,12 @@ const changelogInputSchema = `{
 const changelogOutputSchema = `{
 	"type": "object",
 	"properties": {
-		"changelog": {"type": "string"},
-		"version": {"type": "string"}
+		"version": {"type": "string"},
+		"date": {"type": "string"},
+		"sections": {
+			"type": "object",
+			"additionalProperties": {"type": "array", "items": {"type": "string"}}
+		}
 	},
-	"required": ["changelog", "version"]
+	"required": ["version", "date", "sections"]
 }`
