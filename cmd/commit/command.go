@@ -44,13 +44,7 @@ func NewCommand(repo git.Repo, llmProvider llm.Provider, cfg *Config) *cobra.Com
 	cmd := &cobra.Command{
 		Use:   "commit",
 		Short: "Generate AI-powered commit message",
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			defer func() {
-				if r := recover(); r != nil {
-					err = fmt.Errorf("panic: %v", r)
-				}
-			}()
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: RunE started\n")
+		RunE: func(cmd *cobra.Command, args []string) error {
 			diff, err := repo.DiffCached(git.DiffOptions{})
 			if err != nil {
 				return err
@@ -60,21 +54,14 @@ func NewCommand(repo git.Repo, llmProvider llm.Provider, cfg *Config) *cobra.Com
 			}
 
 			ctx := cmd.Context()
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: dryRun=%v, style=%v\n", dryRun, style)
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: creating registry\n")
 			reg := prompt.NewRegistry()
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: registry created\n")
 			tpl, err := reg.Get("commit", "1")
 			if err != nil {
 				return fmt.Errorf("get template: %w", err)
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: got template\n")
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: about to call getStagedFiles\n")
 
 			files := getStagedFiles(repo)
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: got files: %v\n", files)
 			contextStr := getContext(repo)
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: got context: %s\n", contextStr)
 
 			req, err := tpl.Render(map[string]any{
 				"Diff":    diff,
@@ -84,22 +71,18 @@ func NewCommand(repo git.Repo, llmProvider llm.Provider, cfg *Config) *cobra.Com
 			if err != nil {
 				return fmt.Errorf("render template: %w", err)
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: rendered template\n")
 
 			resp, err := llmProvider.Complete(ctx, *req)
 			if err != nil {
 				return fmt.Errorf("llm complete: %w", err)
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: got LLM response: %s\n", resp.Content)
 
 			var out CommitOutput
 			if err := json.Unmarshal([]byte(resp.Content), &out); err != nil {
 				return fmt.Errorf("unmarshal: %w", err)
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: unmarshaled: %+v\n", out)
 
 			msg := formatMessage(out, style, signOff)
-			fmt.Fprintf(cmd.ErrOrStderr(), "DEBUG: formatted msg: %s\n", msg)
 
 			if dryRun {
 				cmd.Println(msg)

@@ -20,8 +20,22 @@ type ProviderConfig struct {
 
 // ToolsConfig holds tools configuration
 type ToolsConfig struct {
-	Enabled []string `mapstructure:"enabled"`
-	Timeout int      `mapstructure:"timeout" validate:"min=1,max=600"`
+	Enabled  []string     `mapstructure:"enabled"`
+	Timeout  int          `mapstructure:"timeout" validate:"min=1,max=600"`
+	Commit   CommitConfig `mapstructure:"commit"`
+	Review   ReviewConfig `mapstructure:"review"`
+}
+
+// ReviewConfig holds code review configuration
+type ReviewConfig struct {
+	SeverityThreshold string   `mapstructure:"severity_threshold" validate:"oneof=error warning info"`
+	ExcludePatterns   []string `mapstructure:"exclude_patterns"`
+	IncludePatterns   []string `mapstructure:"include_patterns"`
+}
+
+// CommitConfig holds commit command configuration
+type CommitConfig struct {
+	Style string `mapstructure:"style"`
 }
 
 // GitHubConfig holds GitHub-specific configuration

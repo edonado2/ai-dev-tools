@@ -120,6 +120,10 @@ func setDefaults(v *viper.Viper) {
 	// Tools defaults
 	v.SetDefault("tools.enabled", []string{})
 	v.SetDefault("tools.timeout", 120)
+	v.SetDefault("tools.commit.style", "conventional")
+	v.SetDefault("tools.review.severity_threshold", "warning")
+	v.SetDefault("tools.review.exclude_patterns", []string{})
+	v.SetDefault("tools.review.include_patterns", []string{})
 
 	// GitHub defaults
 	v.SetDefault("github.token_env", "GITHUB_TOKEN")

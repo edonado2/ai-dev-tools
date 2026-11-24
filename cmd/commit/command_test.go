@@ -12,7 +12,6 @@ import (
 
 	"github.com/ernedo/ai-dev-tools/pkg/git"
 	"github.com/ernedo/ai-dev-tools/pkg/llm"
-	"github.com/ernedo/ai-dev-tools/pkg/prompt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -56,43 +55,28 @@ func (m *mockProvider) SupportsJSONMode() bool {
 // setupGitRepo creates a temporary git repo with staged changes for testing
 func setupGitRepo(t *testing.T) git.Repo {
 	t.Helper()
-	t.Logf("setupGitRepo: creating temp dir")
 	tmpDir := t.TempDir()
-	t.Logf("setupGitRepo: temp dir: %s", tmpDir)
 
 	// Initialize git repo
-	t.Logf("setupGitRepo: git init")
 	execGit(t, tmpDir, "init")
-	t.Logf("setupGitRepo: git init done")
 
 	// Configure git user
-	t.Logf("setupGitRepo: git config")
 	execGit(t, tmpDir, "config", "user.email", "test@example.com")
 	execGit(t, tmpDir, "config", "user.name", "Test User")
-	t.Logf("setupGitRepo: git config done")
 
 	// Create a file and commit it
-	t.Logf("setupGitRepo: creating file")
 	testFile := filepath.Join(tmpDir, "test.txt")
 	os.WriteFile(testFile, []byte("initial content"), 0644)
-	t.Logf("setupGitRepo: git add")
 	execGit(t, tmpDir, "add", "test.txt")
-	t.Logf("setupGitRepo: git commit")
 	execGit(t, tmpDir, "commit", "-m", "initial commit")
-	t.Logf("setupGitRepo: git commit done")
 
 	// Create a staged change
-	t.Logf("setupGitRepo: modifying file")
 	os.WriteFile(testFile, []byte("modified content"), 0644)
-	t.Logf("setupGitRepo: git add modified")
 	execGit(t, tmpDir, "add", "test.txt")
-	t.Logf("setupGitRepo: git add done")
 
 	// Open the repo
-	t.Logf("setupGitRepo: opening repo")
 	repo, err := git.Open(tmpDir)
 	require.NoError(t, err)
-	t.Logf("setupGitRepo: repo opened")
 
 	return repo
 }
@@ -123,37 +107,7 @@ func defaultConfig() *Config {
 }
 
 func TestCommitCommand_DryRun_PrintsMessage(t *testing.T) {
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("PANIC in test: %v", r)
-		}
-	}()
-
-	t.Logf("TEST STARTED")
-
-	// Test prompt.NewRegistry() in isolation
-	t.Logf("Creating registry...")
-	reg := prompt.NewRegistry()
-	t.Logf("Registry created")
-	tpl, err := reg.Get("commit", "1")
-	if err != nil {
-		t.Logf("Error getting template: %v", err)
-	} else {
-		t.Logf("Got template: %s v%s", tpl.Name, tpl.Version)
-	}
-
-	t.Logf("About to setup repo...")
-	t.Logf("Calling setupGitRepo now...")
 	repo := setupGitRepo(t)
-	t.Logf("Repo setup done")
-
-	// Debug: check what the repo sees
-	status, _ := repo.Status()
-	t.Logf("Status: Staged=%v, Unstaged=%v, Untracked=%v", status.Staged, status.Unstaged, status.Untracked)
-
-	diff, _ := repo.DiffCached(git.DiffOptions{})
-	t.Logf("DiffCached length: %d", len(diff))
-
 	llm := &mockProvider{response: `{"message":"feat(cli): add commit cmd","type":"feat","scope":"cli"}`}
 	cmd := NewCommand(repo, llm, &Config{Tools: ToolsConfig{Commit: CommitConfig{Style: "conventional"}}})
 
@@ -163,15 +117,8 @@ func TestCommitCommand_DryRun_PrintsMessage(t *testing.T) {
 	cmd.SetErr(&errBuf)
 	cmd.SetArgs([]string{"--dry-run"})
 
-	t.Logf("BEFORE EXECUTE")
-	err = cmd.Execute()
-	t.Logf("AFTER EXECUTE")
-	t.Logf("Stderr: %s", errBuf.String())
-	if err != nil {
-		t.Logf("Error: %v", err)
-	}
+	err := cmd.Execute()
 	assert.NoError(t, err)
-	t.Logf("Output: %s", out.String())
 	assert.Contains(t, out.String(), "feat(cli): add commit cmd")
 }
 
@@ -187,7 +134,7 @@ func TestCommitCommand_Interactive_CommitsOnConfirm(t *testing.T) {
 	cmd.SetOut(&out)
 	cmd.SetErr(&out)
 
-	err := cmd.RunE(cmd, []string{})
+	err := cmd.Execute()
 	assert.NoError(t, err)
 
 	// Verify commit was created
