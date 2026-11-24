@@ -127,6 +127,9 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("tools.testgen.framework", "")
 	v.SetDefault("tools.testgen.output", "file")
 	v.SetDefault("tools.testgen.coverage", false)
+	v.SetDefault("tools.changelog.format", "keepachangelog")
+	v.SetDefault("tools.changelog.include_prs", false)
+	v.SetDefault("tools.changelog.output", "")
 
 	// GitHub defaults
 	v.SetDefault("github.token_env", "GITHUB_TOKEN")
@@ -150,6 +153,9 @@ func bindEnvVars(v *viper.Viper) {
 	// Tools
 	v.BindEnv("tools.enabled", "AI_DEV_TOOLS_ENABLED")
 	v.BindEnv("tools.timeout", "AI_DEV_TOOLS_TIMEOUT")
+	v.BindEnv("tools.changelog.format", "AI_DEV_CHANGELOG_FORMAT")
+	v.BindEnv("tools.changelog.include_prs", "AI_DEV_CHANGELOG_INCLUDE_PRS")
+	v.BindEnv("tools.changelog.output", "AI_DEV_CHANGELOG_OUTPUT")
 
 	// GitHub
 	v.BindEnv("github.token_env", "AI_DEV_GITHUB_TOKEN_ENV")
