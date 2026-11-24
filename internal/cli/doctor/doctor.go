@@ -2,15 +2,23 @@
 package doctor
 
 import (
+	cmddoctor "github.com/ernedo/ai-dev-tools/cmd/doctor"
+	"github.com/ernedo/ai-dev-tools/pkg/config"
+	"github.com/ernedo/ai-dev-tools/pkg/git"
+	"github.com/ernedo/ai-dev-tools/pkg/github"
+	"github.com/ernedo/ai-dev-tools/pkg/llm"
 	"github.com/spf13/cobra"
 )
 
+// NewCmd creates the doctor command with all dependencies wired up
 func NewCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "doctor",
-		Short: "Check system health",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return nil
-		},
-	}
+	var repo git.Repo
+	var ghClient github.Client
+	var llmProvider llm.Provider
+	var cfg *config.Config
+	var configDir string
+
+	// This will be initialized by the root command's PersistentPreRunE
+	// For now, return the command structure
+	return cmddoctor.NewCommand(repo, ghClient, llmProvider, cfg, configDir)
 }
