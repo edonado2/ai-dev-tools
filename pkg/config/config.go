@@ -20,10 +20,11 @@ type ProviderConfig struct {
 
 // ToolsConfig holds tools configuration
 type ToolsConfig struct {
-	Enabled  []string     `mapstructure:"enabled"`
-	Timeout  int          `mapstructure:"timeout" validate:"min=1,max=600"`
-	Commit   CommitConfig `mapstructure:"commit"`
-	Review   ReviewConfig `mapstructure:"review"`
+	Enabled  []string      `mapstructure:"enabled"`
+	Timeout  int           `mapstructure:"timeout" validate:"min=1,max=600"`
+	Commit   CommitConfig  `mapstructure:"commit"`
+	Review   ReviewConfig  `mapstructure:"review"`
+	TestGen  TestGenConfig `mapstructure:"testgen"`
 }
 
 // ReviewConfig holds code review configuration
@@ -36,6 +37,13 @@ type ReviewConfig struct {
 // CommitConfig holds commit command configuration
 type CommitConfig struct {
 	Style string `mapstructure:"style"`
+}
+
+// TestGenConfig holds test generation configuration
+type TestGenConfig struct {
+	Framework string `mapstructure:"framework"`
+	Output    string `mapstructure:"output"`
+	Coverage  bool   `mapstructure:"coverage"`
 }
 
 // GitHubConfig holds GitHub-specific configuration

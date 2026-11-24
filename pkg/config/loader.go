@@ -124,6 +124,9 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("tools.review.severity_threshold", "warning")
 	v.SetDefault("tools.review.exclude_patterns", []string{})
 	v.SetDefault("tools.review.include_patterns", []string{})
+	v.SetDefault("tools.testgen.framework", "")
+	v.SetDefault("tools.testgen.output", "file")
+	v.SetDefault("tools.testgen.coverage", false)
 
 	// GitHub defaults
 	v.SetDefault("github.token_env", "GITHUB_TOKEN")
