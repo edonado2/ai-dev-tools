@@ -1,0 +1,40 @@
+# .goreleaser.yaml
+version: 2
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+builds:
+  - id: ai-dev
+    main: ./cmd/ai-dev
+    binary: ai-dev
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+    env:
+      - CGO_ENABLED=0
+archives:
+  - format: tar.gz
+    name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}"
+    files:
+      - README.md
+      - LICENSE
+checksum:
+  name_template: "checksums.txt"
+release:
+  github:
+    owner: ernedo
+    name: ai-dev-tools
+  draft: false
+homebrew:
+  tap:
+    owner: ernedo
+    name: homebrew-tap
+  folder: Formula
+  homepage: "https://github.com/ernedo/ai-dev-tools"
+  description: "AI-powered developer tools CLI"
+  license: "MIT"

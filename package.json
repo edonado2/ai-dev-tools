@@ -1,0 +1,16 @@
+{
+  "name": "@ernedo/ai-dev-tools",
+  "version": "0.0.0",
+  "description": "AI-powered developer tools CLI",
+  "bin": { "ai-dev": "./bin/ai-dev" },
+  "scripts": {
+    "prepare": "node scripts/download-binary.js",
+    "test": "node --test scripts/download-binary.test.js"
+  },
+  "files": ["bin", "lib"],
+  "engines": { "node": ">=18" },
+  "os": ["darwin", "linux", "win32"],
+  "cpu": ["x64", "arm64"],
+  "repository": "github:ernedo/ai-dev-tools",
+  "license": "MIT"
+}

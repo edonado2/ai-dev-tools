@@ -12,13 +12,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
-	Use:               "ai-dev",
-	Short:             "AI-powered developer tools",
-	PersistentPreRunE: initConfig,
-}
+var (
+	rootCmd = &cobra.Command{
+		Use:               "ai-dev",
+		Short:             "AI-powered developer tools",
+		PersistentPreRunE: initConfig,
+	}
+	appVersion = "dev"
+	appCommit  = "none"
+	appDate    = "unknown"
+)
 
-func Execute() {
+func Execute(version, commit, date string) {
+	appVersion = version
+	appCommit = commit
+	appDate = date
 	rootCmd.Execute()
 }
 
@@ -33,8 +41,8 @@ func init() {
 		testgen.NewCmd(),
 		changelog.NewCmd(),
 		config.NewCmd(),
-		version.NewCmd(),
 		doctor.NewCmd(),
+		version.NewCmd(appVersion, appCommit, appDate),
 	)
 }
 

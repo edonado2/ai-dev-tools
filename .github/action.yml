@@ -1,0 +1,37 @@
+# .github/action.yml
+name: "AI Code Review"
+description: "Automated code review using LLMs"
+author: "ernedo"
+inputs:
+  github_token:
+    description: "GitHub token for API access"
+    required: true
+  provider:
+    description: "LLM provider (anthropic, openai, ollama, custom)"
+    required: false
+    default: "anthropic"
+  model:
+    description: "Model name"
+    required: false
+    default: "claude-3-5-sonnet-20241022"
+  api_key_env:
+    description: "Environment variable name for API key"
+    required: false
+    default: "ANTHROPIC_API_KEY"
+  base_url:
+    description: "Base URL for custom provider"
+    required: false
+  severity:
+    description: "Minimum severity to report (error, warning, info)"
+    required: false
+    default: "warning"
+  pr_number:
+    description: "Pull request number (default: from context)"
+    required: false
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - "review"
+    - "--output"
+    - "github"
