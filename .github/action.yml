@@ -1,7 +1,7 @@
 # .github/action.yml
 name: "AI Code Review"
 description: "Automated code review using LLMs"
-author: "ernedo"
+author: "edonado2"
 inputs:
   github_token:
     description: "GitHub token for API access"

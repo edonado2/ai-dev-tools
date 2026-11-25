@@ -1,11 +1,11 @@
 #!/bin/bash
 # scripts/install.sh - Install ai-dev-tools
 # Usage: curl -sfL https://get.ai-dev.tools | sh
-#        or: curl -sfL https://raw.githubusercontent.com/ernedo/ai-dev-tools/main/scripts/install.sh | sh
+#        or: curl -sfL https://raw.githubusercontent.com/edonado2/ai-dev-tools/main/scripts/install.sh | sh
 
 set -euo pipefail
 
-REPO="ernedo/ai-dev-tools"
+REPO="edonado2/ai-dev-tools"
 BINARY="ai-dev"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 
@@ -60,8 +60,8 @@ install_binary() {
     log_info "Downloading $asset_name..."
     if ! curl -sfL "$url" -o "$tmp_file"; then
         log_error "Failed to download $url"
-        log_warn "Try installing via: brew tap ernedo/tap && brew install ai-dev-tools"
-        log_warn "Or: npm i -g @ernedo/ai-dev-tools"
+        log_warn "Try installing via: brew tap edonado2/tap && brew install ai-dev-tools"
+        log_warn "Or: npm i -g @edonado2/ai-dev-tools"
         exit 1
     fi
 

@@ -1,5 +1,5 @@
 {
-  "name": "@ernedo/ai-dev-tools",
+  "name": "@edonado2/ai-dev-tools",
   "version": "0.0.0",
   "description": "AI-powered developer tools CLI",
   "bin": { "ai-dev": "./bin/ai-dev" },
@@ -11,6 +11,6 @@
   "engines": { "node": ">=18" },
   "os": ["darwin", "linux", "win32"],
   "cpu": ["x64", "arm64"],
-  "repository": "github:ernedo/ai-dev-tools",
+  "repository": "github:edonado2/ai-dev-tools",
   "license": "MIT"
 }

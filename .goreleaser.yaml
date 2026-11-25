@@ -27,14 +27,14 @@ checksum:
   name_template: "checksums.txt"
 release:
   github:
-    owner: ernedo
+    owner: edonado2
     name: ai-dev-tools
   draft: false
 homebrew:
   tap:
-    owner: ernedo
+    owner: edonado2
     name: homebrew-tap
   folder: Formula
-  homepage: "https://github.com/ernedo/ai-dev-tools"
+  homepage: "https://github.com/edonado2/ai-dev-tools"
   description: "AI-powered developer tools CLI"
   license: "MIT"
