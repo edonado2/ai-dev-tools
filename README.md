@@ -135,3 +135,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## Security
 
 See [SECURITY.md](SECURITY.md) for reporting vulnerabilities.
+
+## What I built and what was hard
+
+I built a Go CLI with four commands: commit, review, testgen and changelog. The LLM layer supports Anthropic, OpenAI, Ollama and other OpenAI-compatible endpoints. The review command runs four passes (security, bugs, style, performance) and can post findings to a pull request. It ships as a GitHub Action and through Homebrew, npm, Scoop and a shell installer.
+
+The hard part was reading repository state where libgit2 is unavailable. `pkg/git` uses libgit2 when present and falls back to the git CLI behind one interface, so commands behave the same on a laptop and in CI. Keeping the four review passes returning the same structured output across providers took more work than writing the passes themselves.
