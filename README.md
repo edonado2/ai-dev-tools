@@ -1,5 +1,7 @@
 # ai-dev-tools
 
+[![CI](https://github.com/edonado2/ai-dev-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/edonado2/ai-dev-tools/actions/workflows/ci.yml)
+
 AI-powered developer tools: commit, review, testgen, changelog.
 
 ## Features

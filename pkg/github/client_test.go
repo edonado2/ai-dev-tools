@@ -8,8 +8,8 @@ import (
 )
 
 func TestClient_GetPR_ReturnsPR(t *testing.T) {
-	if testing.Short() {
-		t.Skip("requires GitHub token")
+	if testing.Short() || os.Getenv("RUN_INTEGRATION") != "1" {
+		t.Skip("requires GITHUB_TOKEN; set RUN_INTEGRATION=1 to run")
 	}
 	c := New(os.Getenv("GITHUB_TOKEN"))
 	pr, err := c.GetPR("ernedo", "test-repo", 1)
@@ -18,8 +18,8 @@ func TestClient_GetPR_ReturnsPR(t *testing.T) {
 }
 
 func TestClient_CreateReviewComment_PostsComment(t *testing.T) {
-	if testing.Short() {
-		t.Skip("requires GitHub token")
+	if testing.Short() || os.Getenv("RUN_INTEGRATION") != "1" {
+		t.Skip("requires GITHUB_TOKEN; set RUN_INTEGRATION=1 to run")
 	}
 	c := New(os.Getenv("GITHUB_TOKEN"))
 	err := c.CreateReviewComment("ernedo", "test-repo", 1, ReviewComment{
