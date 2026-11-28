@@ -10,8 +10,8 @@ import (
 )
 
 func TestOpenAI_Complete_ReturnsStructuredOutput(t *testing.T) {
-	if testing.Short() {
-		t.Skip("requires API key")
+	if testing.Short() || os.Getenv("RUN_INTEGRATION") != "1" {
+		t.Skip("requires OPENAI_API_KEY; set RUN_INTEGRATION=1 to run")
 	}
 	ctx := context.Background()
 	p, err := NewOpenAI(Config{APIKey: os.Getenv("OPENAI_API_KEY"), Model: "gpt-4o-mini"})
